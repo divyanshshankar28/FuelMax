@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FuelMax Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#080808;color:#f0f0f0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+.top-bar{background:rgba(8,8,8,0.97);border-bottom:1px solid #1a1a1a;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{font-size:20px;font-weight:800;letter-spacing:1px;}
+.logo-fuel{color:#00e676;}
+.logo-max{color:#ff6d00;}
+.logo-badge{font-size:10px;background:#ff6d00;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;}
+.logo-badge.purple{background:#ce93d8;color:#000;}
+.back-btn{background:transparent;border:1px solid #2a2a2a;color:#888;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;}
+.back-btn:hover{border-color:#00e676;color:#00e676;}
+.hero{text-align:center;padding:40px 20px 20px;}
+.hero-icon{width:70px;height:70px;background:#00e67610;border:1px solid #00e67630;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;}
+.hero h1{font-size:26px;font-weight:800;line-height:1.3;}
+.hero p{color:#888;font-size:14px;margin-top:8px;}
+.land-grid{display:grid;gap:12px;padding:16px 16px 30px;}
+.land-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:20px;cursor:pointer;position:relative;overflow:hidden;transition:0.2s;}
+.land-card:hover{transform:translateY(-2px);}
+.land-card .lc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
+.land-card h2{font-size:16px;font-weight:700;margin-bottom:4px;}
+.land-card p{font-size:13px;color:#666;line-height:1.5;}
+.land-card .arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#444;font-size:20px;}
+.page-pad{padding:16px;}
+.page-title{font-size:22px;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#888;margin-bottom:20px;}
+.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:18px;margin-bottom:14px;}
+.card-title{font-size:12px;font-weight:700;color:#00e676;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+label{font-size:12px;color:#888;margin-bottom:5px;display:block;font-weight:500;}
+input,select{width:100%;background:#111;border:1px solid #2a2a2a;color:#f0f0f0;padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:12px;outline:none;}
+input:focus,select:focus{border-color:#00e676;}
+input::placeholder{color:#444;}
+select option{background:#111;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:0.2s;display:block;}
+.btn-green{background:#00e676;color:#000;}
+.btn-green:hover{background:#00c853;}
+.btn-orange{background:#ff6d00;color:#fff;}
+.btn-orange:hover{background:#e65100;}
+.btn-outline{background:transparent;border:1px solid #2a2a2a;color:#888;padding:12px;width:100%;border-radius:10px;cursor:pointer;font-size:14px;}
+.btn-outline:hover{border-color:#ff6d00;color:#ff6d00;}
+.btn-sm{padding:7px 14px;width:auto;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600;border:none;display:inline-block;}
+.btn-sm-green{background:#00e67620;color:#00e676;border:1px solid #00e67640 !important;}
+.btn-sm-orange{background:#ff6d0020;color:#ff6d00;border:1px solid #ff6d0040 !important;}
+.btn-sm-red{background:#ef535020;color:#ef5350;border:1px solid #ef535040 !important;}
+.btn-sm-blue{background:#40c4ff20;color:#40c4ff;border:1px solid #40c4ff40 !important;}
+.btn-purple{background:#ce93d820;color:#ce93d8;border:1px solid #ce93d840 !important;padding:12px;width:100%;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;}
+.tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:9px 16px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;cursor:pointer;font-size:13px;color:#888;font-weight:500;}
+.tab.active{background:#00e676;color:#000;border-color:#00e676;font-weight:700;}
+.macro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.macro-box{background:#111;border-radius:12px;padding:16px 12px;text-align:center;border:1px solid #222;}
+.macro-box .val{font-size:22px;font-weight:800;}
+.macro-box .lbl{font-size:11px;color:#888;margin-top:3px;text-transform:uppercase;}
+.macro-box .sub{font-size:11px;margin-top:3px;}
+.cal .val{color:#ff6d00;}
+.pro .val{color:#00e676;}
+.car .val{color:#40c4ff;}
+.fat .val{color:#ffd740;}
+.prog-bar{background:#222;border-radius:20px;height:8px;overflow:hidden;margin-top:6px;}
+.prog-fill{height:100%;border-radius:20px;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#00e67620;color:#00e676;border:1px solid #00e67630;}
+.badge-red{background:#ef535020;color:#ef5350;border:1px solid #ef535030;}
+.badge-orange{background:#ff6d0020;color:#ff6d00;border:1px solid #ff6d0030;}
+.client-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:16px;margin-bottom:12px;}
+.avatar{width:44px;height:44px;border-radius:12px;background:#1a1a1a;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#00e676;flex-shrink:0;}
+.drow{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
+.drow .dk{color:#666;}
+.drow .dv{color:#ccc;font-weight:500;}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.tip-box{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #2a2a2a;}
+.tip-box.g{background:#00e67608;border-color:#00e67625;}
+.tip-box.o{background:#ff6d0008;border-color:#ff6d0025;}
+.tip-box.b{background:#40c4ff08;border-color:#40c4ff25;}
+.tip-box.y{background:#ffd74008;border-color:#ffd74025;}
+.tip-title{font-size:12px;font-weight:700;margin-bottom:6px;}
+.tip-text{font-size:13px;color:#ccc;line-height:1.6;}
+.food-log-item{background:#111;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #222;display:flex;justify-content:space-between;align-items:center;}
+.fli-name{font-size:13px;font-weight:600;}
+.fli-meta{font-size:11px;color:#666;margin-top:2px;}
+.fli-macros{text-align:right;font-size:12px;}
+.supp-item{background:#111;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #222;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.stat-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:14px 10px;text-align:center;}
+.stat-card .sv{font-size:22px;font-weight:800;}
+.stat-card .sl{font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;}
+.msg{font-size:13px;margin-top:10px;padding:10px 14px;border-radius:8px;}
+.msg.err{background:#ef535015;color:#ef5350;border:1px solid #ef535030;}
+.msg.ok{background:#00e67615;color:#00e676;border:1px solid #00e67630;}
+.empty{text-align:center;padding:30px;color:#555;font-size:14px;}
+.paused-wrap{text-align:center;padding:50px 20px;}
+.gym-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:18px;margin-bottom:14px;}
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.sec-title{font-size:14px;font-weight:700;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:24px;width:100%;max-width:380px;}
+</style>
+</head>
+<body>
+
+<div id="screen-landing" class="screen active">
+  <div class="top-bar">
+    <div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span><span class="logo-badge">PRO</span></div>
+  </div>
+  <div class="hero">
+    <div class="hero-icon">💪</div>
+    <h1>Smart Nutrition &<br><span style="color:#00e676">Gym Management</span></h1>
+    <p>Track macros, manage members and dominate your goals</p>
+  </div>
+  <div class="land-grid">
+    <div class="land-card" onclick="show('screen-member-login')">
+      <div class="lc-icon" style="background:#00e67615;">🏃</div>
+      <h2>I'm a Member</h2><p>Login to track nutrition, macros and progress</p><div class="arrow">›</div>
+    </div>
+    <div class="land-card" onclick="show('screen-register')">
+      <div class="lc-icon" style="background:#40c4ff15;">✨</div>
+      <h2>New Member</h2><p>Register with your gym code and get started</p><div class="arrow">›</div>
+    </div>
+    <div class="land-card" onclick="show('screen-owner-login')">
+      <div class="lc-icon" style="background:#ff6d0015;">🏋️</div>
+      <h2>Gym Owner</h2><p>Manage members, subscriptions and nutrition</p><div class="arrow">›</div>
+    </div>
+    <div class="land-card" onclick="show('screen-super-login')">
+      <div class="lc-icon" style="background:#ce93d815;">👑</div>
+      <h2>Super Admin</h2><p>Control all gyms on the platform</p><div class="arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-register" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">← Back</button></div>
+  <div class="page-pad">
+    <div class="page-title">Join FuelMax</div>
+    <div class="page-sub">Create your profile to get started</div>
+    <div class="card">
+      <div class="card-title">Personal Info</div>
+      <label>Full Name</label><input id="r-name" placeholder="Your full name">
+      <div class="row2">
+        <div><label>Age</label><input id="r-age" type="number" placeholder="25"></div>
+        <div><label>Gender</label><select id="r-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+      </div>
+      <div class="row2">
+        <div><label>Height (cm)</label><input id="r-height" type="number" placeholder="170"></div>
+        <div><label>Weight (kg)</label><input id="r-weight" type="number" placeholder="65"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Goal and Activity</div>
+      <label>Fitness Goal</label>
+      <select id="r-goal">
+        <option value="">Select goal...</option>
+        <option value="muscle">Muscle Building</option>
+        <option value="fatloss">Fat Loss</option>
+        <option value="weightgain">Weight Gain</option>
+        <option value="recomp">Body Recomposition</option>
+      </select>
+      <label>Activity Level</label>
+      <select id="r-act">
+        <option value="1.2">Sedentary (no exercise)</option>
+        <option value="1.375">Lightly Active (1-3 days/week)</option>
+        <option value="1.55" selected>Moderately Active (3-5 days/week)</option>
+        <option value="1.725">Very Active (6-7 days/week)</option>
+        <option value="1.9">Athlete (2x training/day)</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-title">Access and Security</div>
+      <label>Gym Code</label><input id="r-gym" placeholder="Enter code given by your gym">
+      <label>Create 4-digit Passcode</label><input id="r-pass" type="password" maxlength="4" placeholder="PIN">
+    </div>
+    <button class="btn btn-green" onclick="registerMember()">Create Account</button>
+    <div id="r-msg"></div>
+  </div>
+</div>
+
+<div id="screen-member-login" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">← Back</button></div>
+  <div class="page-pad">
+    <div class="page-title">Member Login</div>
+    <div class="page-sub">Access your nutrition dashboard</div>
+    <div class="card">
+      <label>Full Name (as registered)</label><input id="l-name" placeholder="Your name">
+      <label>Your 4-digit Passcode</label><input id="l-pass" type="password" maxlength="4" placeholder="PIN">
+      <button class="btn btn-green" onclick="memberLogin()">Login</button>
+      <div id="l-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-owner-login" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">← Back</button></div>
+  <div class="page-pad">
+    <div class="page-title">Gym Owner Login</div>
+    <div class="page-sub">Manage your gym and members</div>
+    <div class="card">
+      <label>Gym Code</label><input id="o-gym" placeholder="Your gym code">
+      <label>Owner Passcode</label><input id="o-pass" type="password" placeholder="Owner passcode">
+      <button class="btn btn-orange" onclick="ownerLogin()">Access Dashboard</button>
+      <div id="o-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-super-login" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">← Back</button></div>
+  <div class="page-pad">
+    <div class="page-title">Super Admin</div>
+    <div class="page-sub">Platform-wide control panel</div>
+    <div class="card">
+      <label>Super Admin Password</label><input id="s-pass" type="password" placeholder="Password">
+      <button class="btn-purple" onclick="superLogin()">Enter Admin Panel</button>
+      <div id="s-msg"></div>
+      <div style="margin-top:14px;padding:10px 14px;background:#111;border-radius:8px;font-size:12px;color:#555;">Default password: <span style="color:#ce93d8;">SUPER2024</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-member" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">Logout</button></div>
+  <div class="page-pad">
+    <div id="m-welcome"></div>
+    <div id="m-paused" style="display:none;" class="paused-wrap">
+      <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+      <h2 style="color:#ef5350;margin-bottom:8px;">Program Paused</h2>
+      <p style="color:#666;font-size:14px;">Your gym has paused your program. Contact your gym owner.</p>
+    </div>
+    <div id="m-content">
+      <div class="tabs">
+        <div class="tab active" onclick="mTab(this,'mt-home')">Dashboard</div>
+        <div class="tab" onclick="mTab(this,'mt-food')">Food Log</div>
+        <div class="tab" onclick="mTab(this,'mt-supps')">Supplements</div>
+        <div class="tab" onclick="mTab(this,'mt-eaten')">Eaten Today</div>
+        <div class="tab" onclick="mTab(this,'mt-tips')">Tips</div>
+        <div class="tab" onclick="mTab(this,'mt-edit')">Edit Profile</div>
+      </div>
+      <div id="mt-home"></div>
+      <div id="mt-food" style="display:none;"></div>
+      <div id="mt-supps" style="display:none;"></div>
+      <div id="mt-eaten" style="display:none;"></div>
+      <div id="mt-tips" style="display:none;"></div>
+      <div id="mt-edit" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-owner" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span></div><button class="back-btn" onclick="show('screen-landing')">Logout</button></div>
+  <div class="page-pad" id="owner-content"></div>
+</div>
+
+<div id="screen-super" class="screen">
+  <div class="top-bar"><div class="logo"><span class="logo-fuel">Fuel</span><span class="logo-max">Max</span><span class="logo-badge purple">ADMIN</span></div><button class="back-btn" onclick="show('screen-landing')">Logout</button></div>
+  <div class="page-pad" id="super-content"></div>
+</div>
+
+<div id="modal" class="modal-overlay" onclick="modalBgClick(event)">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script>
+var superPass = localStorage.getItem("fm_superpass") || "SUPER2024";
+var db = {gyms:[{code:"GYM001",name:"FuelMax Main Gym",ownerPass:"OWNER2024",active:true,createdAt:new Date().toLocaleDateString()}],members:[]};
+var CUR = null;
+var CUR_GYM = null;
+
+(function(){
+  try { var d = localStorage.getItem("fmdb2"); if(d) db = JSON.parse(d); } catch(e){}
+})();
+
+function sv(){ try{ localStorage.setItem("fmdb2", JSON.stringify(db)); }catch(e){} }
+function show(id){ document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); }); document.getElementById(id).classList.add("active"); window.scrollTo(0,0); }
+function v(id){ var el = document.getElementById(id); return el ? (el.value||"").trim() : ""; }
+function setv(id,val){ var el = document.getElementById(id); if(el) el.value = val||""; }
+function showMsg(id,text,ok){ var el = document.getElementById(id); if(el){ el.className = "msg "+(ok?"ok":"err"); el.textContent = text; } }
+function goalLabel(g){ var m={muscle:"Muscle Building",fatloss:"Fat Loss",weightgain:"Weight Gain",recomp:"Body Recomposition"}; return m[g]||g; }
+
+function openModal(html){ document.getElementById("modal-box").innerHTML = html; document.getElementById("modal").classList.add("open"); }
+function closeModal(){ document.getElementById("modal").classList.remove("open"); }
+function modalBgClick(e){ if(e.target.id==="modal") closeModal(); }
+
+function confirmAction(message, onConfirm){
+  openModal(
+    '<div style="text-align:center;padding:8px;">' +
+    '<div style="font-size:32px;margin-bottom:12px;">⚠️</div>' +
+    '<div style="font-size:15px;font-weight:700;margin-bottom:8px;">Are you sure?</div>' +
+    '<div style="font-size:13px;color:#888;margin-bottom:22px;line-height:1.6;">' + message + '</div>' +
+    '<div style="display:flex;gap:10px;">' +
+    '<button onclick="closeModal()" style="flex:1;padding:11px;border-radius:10px;background:#222;border:1px solid #333;color:#888;cursor:pointer;font-size:14px;font-weight:600;">Cancel</button>' +
+    '<button id="confirm-yes" style="flex:1;padding:11px;border-radius:10px;background:#ef5350;border:none;color:#fff;cursor:pointer;font-size:14px;font-weight:700;">Delete</button>' +
+    '</div></div>'
+  );
+  setTimeout(function(){
+    var btn = document.getElementById("confirm-yes");
+    if(btn){ btn.onclick = function(){ closeModal(); onConfirm(); }; }
+  }, 50);
+}
+
+var FOOD = {
+  rice:{n:"Rice (cooked)",c:130,p:2.7,ca:28,f:0.3},
+  roti:{n:"Roti/Chapati",c:120,p:3.5,ca:22,f:2.4,unit:"piece",unitG:40},
+  chicken:{n:"Chicken Breast",c:165,p:31,ca:0,f:3.6},
+  egg:{n:"Whole Egg",c:155,p:13,ca:1.1,f:11,unit:"egg",unitG:50},
+  eggwhite:{n:"Egg White",c:52,p:11,ca:0.7,f:0.2,unit:"egg",unitG:30},
+  oats:{n:"Oats",c:389,p:17,ca:66,f:7},
+  banana:{n:"Banana",c:89,p:1.1,ca:23,f:0.3},
+  milk:{n:"Whole Milk",c:61,p:3.2,ca:4.8,f:3.3},
+  dal:{n:"Dal/Lentils (cooked)",c:116,p:9,ca:20,f:0.4},
+  paneer:{n:"Paneer",c:265,p:18,ca:1.2,f:21},
+  almonds:{n:"Almonds",c:579,p:21,ca:22,f:50},
+  curd:{n:"Curd/Yogurt",c:61,p:3.5,ca:4.7,f:3.3},
+  peanutbutter:{n:"Peanut Butter",c:588,p:25,ca:20,f:50},
+  broccoli:{n:"Broccoli",c:34,p:2.8,ca:7,f:0.4},
+  sweetpotato:{n:"Sweet Potato",c:86,p:1.6,ca:20,f:0.1},
+  tuna:{n:"Tuna (canned)",c:132,p:29,ca:0,f:1},
+  soyachunks:{n:"Soya Chunks (dry)",c:345,p:52,ca:33,f:0.5},
+  sattu:{n:"Sattu",c:406,p:22,ca:65,f:6},
+  peanuts:{n:"Peanuts (raw)",c:567,p:26,ca:16,f:49},
+  potato:{n:"Potato (boiled)",c:77,p:2,ca:17,f:0.1},
+  soybeans:{n:"Soya Beans (cooked)",c:173,p:17,ca:10,f:9},
+  moong:{n:"Sprouted Moong",c:30,p:3,ca:4,f:0.2},
+  chickpea:{n:"Sprouted Chickpea",c:164,p:9,ca:27,f:2.6},
+  tofu:{n:"Tofu (firm)",c:76,p:8,ca:2,f:4.5},
+  masoor:{n:"Masoor Dal (cooked)",c:116,p:9,ca:20,f:0.4},
+  rajma:{n:"Rajma (cooked)",c:127,p:8.7,ca:23,f:0.5},
+  brownrice:{n:"Brown Rice (cooked)",c:123,p:2.6,ca:26,f:1}
+};
+
+var SUPPS = {
+  whey:{n:"Whey Protein",icon:"🥛"},
+  plant:{n:"Plant Based Protein",icon:"🌱"},
+  casein:{n:"Casein Protein",icon:"🌙"},
+  bcaa:{n:"BCAA",icon:"⚡"},
+  creatine:{n:"Creatine",icon:"💥"},
+  preworkout:{n:"Pre-Workout",icon:"🔥"}
+};
+
+var TIPS = {
+  muscle:[{c:"g",t:"Protein target",d:"Aim for 1.4–1.7g of protein per kg of bodyweight. Dal, paneer, chicken, eggs and soya chunks are your best allies."},{c:"o",t:"Progressive overload",d:"Increase reps, weight or volume every week. Muscles only grow when forced beyond their comfort zone."},{c:"b",t:"Carbs fuel growth",d:"Rice, roti, oats and bananas fuel your workouts. Don't go low-carb if you're trying to build muscle."},{c:"y",t:"Sleep is free anabolics",d:"7-9 hours of quality sleep is when your body builds muscle. It's non-negotiable."},{c:"g",t:"Consistency wins",d:"Showing up 4x a week for 6 months beats 7x a week for 3 weeks every single time."}],
+  fatloss:[{c:"o",t:"Calorie deficit is king",d:"No supplement beats a consistent 300-500 kcal deficit. Track your food for at least 2 weeks."},{c:"g",t:"Protect your muscle",d:"Keep protein high (1.4-1.7g/kg) while cutting. This prevents muscle loss and keeps your metabolism strong."},{c:"b",t:"No crash dieting",d:"Eating too little slows your metabolism and causes muscle loss. A moderate deficit is always more effective."},{c:"y",t:"Hydration matters",d:"Drink 3-4 litres of water daily. Hunger is often just thirst."},{c:"g",t:"Strength train while cutting",d:"Cardio burns calories but lifting weights preserves muscle shape. Do both."}],
+  weightgain:[{c:"g",t:"Eat in a surplus",d:"Consume 300-500 kcal above maintenance every day. Rice, roti, oats and bananas are your friends."},{c:"o",t:"Liquid calories help",d:"Smoothies with milk, banana, peanut butter and oats are calorie-dense and easy to consume."},{c:"b",t:"Train heavy",d:"Your body needs a stimulus to store surplus calories as muscle. Focus on squats, deadlifts and presses."},{c:"y",t:"Don't neglect protein",d:"Even for weight gain, aim for 1.4-1.6g protein/kg to ensure most gain is lean muscle."},{c:"g",t:"Daily consistency",d:"Eating in a surplus one week and not the next won't work. Consistency is the only way."}],
+  recomp:[{c:"b",t:"Eat at maintenance",d:"Recomp works at or near maintenance calories. Slight deficit on rest days, slight surplus on training days."},{c:"g",t:"Protein is the anchor",d:"High protein (1.6-1.8g/kg) ensures your body has material to build muscle while losing fat."},{c:"o",t:"Measure smarter",d:"The scale won't move much. Track body measurements, photos and strength levels instead."},{c:"y",t:"Train 4-5x per week",d:"Resistance training is the primary driver of recomposition. More stimulus means faster results."},{c:"b",t:"It takes time",d:"Recomp is slower than pure bulking or cutting. Expect 6-12 months for visible results."}]
+};
+
+function calcMacros(age,height,weight,goal,activity,gender){
+  var bmr = gender==="female" ? (10*weight+6.25*height-5*age-161) : (10*weight+6.25*height-5*age+5);
+  var tdee = Math.round(bmr*activity);
+  var cal,pro,fat,car;
+  if(goal==="muscle"){
+    cal=tdee+300; pro=Math.round(weight*1.7); fat=Math.round(cal*0.25/9); car=Math.round((cal-pro*4-fat*9)/4);
+  } else if(goal==="fatloss"){
+    cal=Math.max(tdee-450,1200); pro=Math.round(weight*1.6); fat=Math.round(cal*0.28/9); car=Math.round((cal-pro*4-fat*9)/4);
+  } else if(goal==="weightgain"){
+    cal=tdee+400; pro=Math.round(weight*1.5); fat=Math.round(cal*0.28/9); car=Math.round((cal-pro*4-fat*9)/4);
+  } else {
+    cal=tdee; pro=Math.round(weight*1.8); fat=Math.round(cal*0.28/9); car=Math.round((cal-pro*4-fat*9)/4);
+  }
+  if(car<0) car=20;
+  return {cal:cal,pro:pro,car:car,fat:fat};
+}
+
+function registerMember(){
+  var n=v("r-name"),age=+v("r-age"),gender=v("r-gender"),h=+v("r-height"),w=+v("r-weight"),goal=v("r-goal"),act=+v("r-act"),gc=v("r-gym").toUpperCase(),pass=v("r-pass");
+  if(!n||!age||!h||!w||!goal||!gc||!pass){ showMsg("r-msg","Please fill all fields."); return; }
+  if(pass.length!==4||isNaN(pass)){ showMsg("r-msg","Passcode must be exactly 4 digits."); return; }
+  var gym=db.gyms.find(function(g){ return g.code===gc; });
+  if(!gym){ showMsg("r-msg","Invalid gym code. Ask your gym owner."); return; }
+  if(!gym.active){ showMsg("r-msg","This gym subscription is currently inactive."); return; }
+  var exists=db.members.find(function(m){ return m.name.toLowerCase()===n.toLowerCase()&&m.gymCode===gc; });
+  if(exists){ showMsg("r-msg","Name already registered at this gym."); return; }
+  var macros=calcMacros(age,h,w,goal,act,gender);
+  var member={id:Date.now(),name:n,age:age,gender:gender,height:h,weight:w,goal:goal,activity:act,passcode:pass,gymCode:gc,active:true,macros:macros,log:[],supps:[],joinDate:new Date().toLocaleDateString()};
+  db.members.push(member); sv();
+  showMsg("r-msg","Account created! You can now login.",true);
+  setTimeout(function(){ show("screen-member-login"); },1500);
+}
+
+function memberLogin(){
+  var n=v("l-name"),pass=v("l-pass");
+  var m=db.members.find(function(x){ return x.name.toLowerCase()===n.toLowerCase()&&x.passcode===pass; });
+  if(!m){ showMsg("l-msg","Name or passcode incorrect."); return; }
+  var gym=db.gyms.find(function(g){ return g.code===m.gymCode; });
+  if(gym&&!gym.active){ showMsg("l-msg","Your gym subscription is inactive. Contact gym owner."); return; }
+  CUR=m; loadMemberDash(); show("screen-member");
+}
+
+function ownerLogin(){
+  var gc=v("o-gym").toUpperCase(),pass=v("o-pass");
+  var gym=db.gyms.find(function(g){ return g.code===gc&&g.ownerPass===pass; });
+  if(!gym){ showMsg("o-msg","Invalid gym code or passcode."); return; }
+  CUR_GYM=gym; loadOwnerDash(); show("screen-owner");
+}
+
+function superLogin(){
+  if(v("s-pass")!==superPass){ showMsg("s-msg","Invalid super admin password."); return; }
+  loadSuperDash(); show("screen-super");
+}
+
+function syncMember(){
+  var idx=db.members.findIndex(function(m){ return m.id===CUR.id; });
+  if(idx>-1) db.members[idx]=CUR;
+  sv();
+}
+
+function getConsumed(m){
+  var cal=0,pro=0,car=0,fat=0;
+  (m.log||[]).forEach(function(item){
+    var fd=FOOD[item.foodKey]; if(!fd) return;
+    var r=item.grams/100; cal+=fd.c*r; pro+=fd.p*r; car+=fd.ca*r; fat+=fd.f*r;
+  });
+  (m.supps||[]).forEach(function(s){ cal+=s.cal||0; pro+=s.pro||0; car+=s.car||0; fat+=s.fat||0; });
+  return {cal:Math.round(cal),pro:Math.round(pro),car:Math.round(car),fat:Math.round(fat)};
+}
+
+function loadMemberDash(){
+  var m=CUR;
+  document.getElementById("m-welcome").innerHTML=
+    '<div style="background:#1a1a1a;border:1px solid #00e67625;border-radius:14px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">'+
+    '<div style="width:48px;height:48px;border-radius:14px;background:#00e67620;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#00e676;flex-shrink:0;">'+m.name[0].toUpperCase()+'</div>'+
+    '<div><div style="font-size:17px;font-weight:800;">Hey, '+m.name+'! 💪</div>'+
+    '<div style="font-size:12px;color:#666;margin-top:3px;"><span style="color:#ff6d00;">'+goalLabel(m.goal)+'</span> · '+m.weight+'kg · '+m.height+'cm · '+m.age+'yrs</div></div></div>';
+  if(!m.active){
+    document.getElementById("m-paused").style.display="block";
+    document.getElementById("m-content").style.display="none";
+    return;
+  }
+  document.getElementById("m-paused").style.display="none";
+  document.getElementById("m-content").style.display="block";
+  renderHomeDash(); renderFoodTab(); renderSuppsTab(); renderEatenTab(); renderTipsTab(); renderEditTab();
+}
+
+function renderHomeDash(){
+  var m=CUR,mac=m.macros,con=getConsumed(m);
+  var items=[
+    {l:"Calories",key:"cal",unit:"kcal",col:"#ff6d00"},
+    {l:"Protein",key:"pro",unit:"g",col:"#00e676"},
+    {l:"Carbs",key:"car",unit:"g",col:"#40c4ff"},
+    {l:"Fats",key:"fat",unit:"g",col:"#ffd740"}
+  ];
+  var bars=items.map(function(x){
+    var rem=Math.max(0,mac[x.key]-con[x.key]);
+    var pct=Math.min(100,Math.round((con[x.key]/mac[x.key])*100));
+    return '<div style="margin-bottom:14px;">'+
+      '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">'+
+      '<span style="color:#888;">'+x.l+'</span>'+
+      '<span style="color:'+x.col+';font-weight:700;">'+rem+' '+x.unit+' left</span></div>'+
+      '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+x.col+';"></div></div></div>';
+  }).join("");
+  var macBoxes=
+    '<div class="macro-box cal"><div class="val">'+mac.cal+'</div><div class="lbl">Target Cal</div><div class="sub" style="color:#ff6d00;">'+con.cal+' eaten</div></div>'+
+    '<div class="macro-box pro"><div class="val">'+mac.pro+'g</div><div class="lbl">Target Protein</div><div class="sub" style="color:#00e676;">'+con.pro+'g eaten</div></div>'+
+    '<div class="macro-box car"><div class="val">'+mac.car+'g</div><div class="lbl">Target Carbs</div><div class="sub" style="color:#40c4ff;">'+con.car+'g eaten</div></div>'+
+    '<div class="macro-box fat"><div class="val">'+mac.fat+'g</div><div class="lbl">Target Fats</div><div class="sub" style="color:#ffd740;">'+con.fat+'g eaten</div></div>';
+  document.getElementById("mt-home").innerHTML=
+    '<div class="card"><div class="card-title">Daily Targets — '+goalLabel(m.goal)+'</div><div class="macro-grid">'+macBoxes+'</div></div>'+
+    '<div class="card"><div class="card-title">Remaining Today</div>'+bars+'</div>';
+}
+
+function renderFoodTab(){
+  var opts=Object.keys(FOOD).map(function(k){ return '<option value="'+k+'">'+FOOD[k].n+'</option>'; }).join("");
+  document.getElementById("mt-food").innerHTML=
+    '<div class="card"><div class="card-title">Add Food to Log</div>'+
+    '<label>Food Item</label><select id="food-sel">'+opts+'</select>'+
+    '<div id="food-unit-hint"></div>'+
+    '<label id="food-wt-lbl">Weight (grams)</label>'+
+    '<input id="food-wt" type="number" placeholder="e.g. 150">'+
+    '<button class="btn btn-green" onclick="addToLog()">Add to Diet Log</button>'+
+    '<div id="food-msg" style="margin-top:8px;font-size:13px;"></div></div>'+
+    '<div class="card"><div class="card-title">Quick Nutrition Lookup</div>'+
+    '<select id="lookup-sel">'+opts+'</select>'+
+    '<input id="lookup-wt" type="number" placeholder="Weight in grams">'+
+    '<button class="btn btn-outline" onclick="lookupFood()">Check Nutrition</button>'+
+    '<div id="lookup-res"></div></div>';
+  document.getElementById("food-sel").addEventListener("change",function(){
+    var fd=FOOD[this.value];
+    if(fd&&fd.unit){
+      document.getElementById("food-unit-hint").innerHTML='<div style="padding:8px 12px;background:#111;border-radius:8px;font-size:12px;color:#888;margin-bottom:8px;">1 '+fd.unit+' = '+fd.unitG+'g — enter number of '+fd.unit+'s</div>';
+      document.getElementById("food-wt-lbl").textContent="Number of "+fd.unit+"s";
+    } else {
+      document.getElementById("food-unit-hint").innerHTML="";
+      document.getElementById("food-wt-lbl").textContent="Weight (grams)";
+    }
+  });
+}
+
+function addToLog(){
+  var key=v("food-sel"),wt=+v("food-wt");
+  var fd=FOOD[key];
+  if(!key||!wt||wt<=0||!fd){ document.getElementById("food-msg").style.color="#ef5350"; document.getElementById("food-msg").textContent="Select a food and enter amount."; return; }
+  var grams=fd.unit?(wt*fd.unitG):wt;
+  CUR.log=CUR.log||[];
+  CUR.log.push({id:Date.now(),foodKey:key,name:fd.n,grams:grams,displayAmt:wt,displayUnit:fd.unit||"g",time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});
+  syncMember(); renderHomeDash(); renderEatenTab();
+  document.getElementById("food-msg").style.color="#00e676";
+  document.getElementById("food-msg").textContent="Added "+wt+(fd.unit||"g")+" of "+fd.n;
+}
+
+function lookupFood(){
+  var key=v("lookup-sel"),wt=+v("lookup-wt");
+  var fd=FOOD[key]; if(!fd||!wt) return;
+  var r=wt/100;
+  document.getElementById("lookup-res").innerHTML=
+    '<div style="margin-top:12px;background:#111;border-radius:12px;padding:14px;border:1px solid #222;">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px;">'+fd.n+' — '+wt+'g</div>'+
+    '<div class="macro-grid">'+
+    '<div class="macro-box cal"><div class="val">'+Math.round(fd.c*r)+'</div><div class="lbl">kcal</div></div>'+
+    '<div class="macro-box pro"><div class="val">'+(fd.p*r).toFixed(1)+'g</div><div class="lbl">protein</div></div>'+
+    '<div class="macro-box car"><div class="val">'+(fd.ca*r).toFixed(1)+'g</div><div class="lbl">carbs</div></div>'+
+    '<div class="macro-box fat"><div class="val">'+(fd.f*r).toFixed(1)+'g</div><div class="lbl">fats</div></div>'+
+    '</div></div>';
+}
+
+function renderSuppsTab(){
+  var opts=Object.keys(SUPPS).map(function(k){ return '<option value="'+k+'">'+SUPPS[k].icon+' '+SUPPS[k].n+'</option>'; }).join("");
+  var existing=(CUR.supps||[]).map(function(s){
+    return '<div class="supp-item"><div style="display:flex;justify-content:space-between;align-items:center;">'+
+      '<div><div style="font-size:14px;font-weight:700;">'+(SUPPS[s.key]?SUPPS[s.key].icon:"💊")+' '+s.name+'</div>'+
+      '<div style="font-size:12px;color:#888;margin-top:3px;">'+s.scoops+' scoop(s) × '+s.proPerScoop+'g protein/scoop</div>'+
+      '<div style="font-size:12px;color:#00e676;margin-top:2px;">+'+s.pro+'g protein · '+s.cal+' kcal</div></div>'+
+      '<button class="btn-sm btn-sm-red" onclick="removeSupp('+s.id+')">Remove</button>'+
+      '</div></div>';
+  }).join("")||'<div class="empty">No supplements added yet</div>';
+  document.getElementById("mt-supps").innerHTML=
+    '<div class="card"><div class="card-title">Add Supplement</div>'+
+    '<label>Type</label><select id="supp-sel">'+opts+'</select>'+
+    '<div class="row2"><div><label>Protein/scoop (g)</label><input id="supp-pps" type="number" placeholder="25"></div>'+
+    '<div><label>Scoops taken</label><input id="supp-sc" type="number" placeholder="1"></div></div>'+
+    '<div class="row2"><div><label>Carbs/scoop (g)</label><input id="supp-cps" type="number" placeholder="3"></div>'+
+    '<div><label>Fat/scoop (g)</label><input id="supp-fps" type="number" placeholder="1"></div></div>'+
+    '<button class="btn btn-green" onclick="addSupp()">Add Supplement</button></div>'+
+    '<div class="card"><div class="card-title">Today\'s Supplements</div>'+existing+'</div>';
+}
+
+function addSupp(){
+  var key=v("supp-sel"),pps=+v("supp-pps"),sc=+v("supp-sc"),cps=+v("supp-cps")||0,fps=+v("supp-fps")||0;
+  if(!key||!pps||!sc) return;
+  var tp=Math.round(pps*sc),tc=Math.round(cps*sc),tf=Math.round(fps*sc),tcal=Math.round(tp*4+tc*4+tf*9);
+  CUR.supps=CUR.supps||[];
+  CUR.supps.push({id:Date.now(),key:key,name:SUPPS[key].n,proPerScoop:pps,scoops:sc,pro:tp,car:tc,fat:tf,cal:tcal});
+  syncMember(); renderSuppsTab(); renderHomeDash(); renderEatenTab();
+}
+
+function removeSupp(id){
+  CUR.supps=(CUR.supps||[]).filter(function(s){ return s.id!==id; });
+  syncMember(); renderSuppsTab(); renderHomeDash(); renderEatenTab();
+}
+
+function renderEatenTab(){
+  var m=CUR,con=getConsumed(m);
+  var foodItems=(m.log||[]).map(function(item){
+    var fd=FOOD[item.foodKey]; if(!fd) return "";
+    var r=item.grams/100;
+    return '<div class="food-log-item">'+
+      '<div><div class="fli-name">'+fd.n+'</div><div class="fli-meta">'+item.displayAmt+' '+item.displayUnit+' · '+item.time+'</div></div>'+
+      '<div class="fli-macros">'+
+      '<div style="color:#ff6d00;font-weight:700;">'+Math.round(fd.c*r)+' kcal</div>'+
+      '<div style="font-size:11px;color:#666;">P:'+(fd.p*r).toFixed(1)+'g C:'+(fd.ca*r).toFixed(1)+'g F:'+(fd.f*r).toFixed(1)+'g</div>'+
+      '<button class="btn-sm btn-sm-red" style="margin-top:6px;" onclick="removeLog('+item.id+')">Remove</button>'+
+      '</div></div>';
+  }).join("")||'<div class="empty">No food logged yet</div>';
+  document.getElementById("mt-eaten").innerHTML=
+    '<div class="card"><div class="card-title">Total Consumed Today</div>'+
+    '<div class="macro-grid">'+
+    '<div class="macro-box cal"><div class="val">'+con.cal+'</div><div class="lbl">kcal eaten</div></div>'+
+    '<div class="macro-box pro"><div class="val">'+con.pro+'g</div><div class="lbl">protein</div></div>'+
+    '<div class="macro-box car"><div class="val">'+con.car+'g</div><div class="lbl">carbs</div></div>'+
+    '<div class="macro-box fat"><div class="val">'+con.fat+'g</div><div class="lbl">fats</div></div>'+
+    '</div></div>'+
+    '<div class="card"><div class="card-title">Food Items</div>'+foodItems+'</div>'+
+    '<button class="btn btn-outline" style="margin-top:4px;color:#ef5350;border-color:#ef535040;" onclick="clearLog()">Clear Today\'s Log</button>';
+}
+
+function removeLog(id){
+  CUR.log=(CUR.log||[]).filter(function(l){ return l.id!==id; });
+  syncMember(); renderHomeDash(); renderEatenTab();
+}
+
+function clearLog(){
+  CUR.log=[]; CUR.supps=[]; syncMember(); renderHomeDash(); renderEatenTab();
+}
+
+function renderTipsTab(){
+  var tipArr=TIPS[CUR.goal]||TIPS.muscle;
+  document.getElementById("mt-tips").innerHTML=
+    '<div class="card"><div class="card-title">Tips for '+goalLabel(CUR.goal)+'</div>'+
+    tipArr.map(function(t){
+      return '<div class="tip-box '+t.c+'"><div class="tip-title" style="color:'+(t.c==="g"?"#00e676":t.c==="o"?"#ff6d00":t.c==="b"?"#40c4ff":"#ffd740")+';">'+t.t+'</div><div class="tip-text">'+t.d+'</div></div>';
+    }).join("")+'</div>';
+}
+
+function renderEditTab(){
+  var m=CUR;
+  document.getElementById("mt-edit").innerHTML=
+    '<div class="card"><div class="card-title">Update Your Stats</div>'+
+    '<div class="row2"><div><label>Age</label><input id="e-age" type="number" value="'+m.age+'"></div>'+
+    '<div><label>Gender</label><select id="e-gender"><option value="male"'+(m.gender==="male"?" selected":"")+'>Male</option><option value="female"'+(m.gender==="female"?" selected":"")+'>Female</option></select></div></div>'+
+    '<div class="row2"><div><label>Height (cm)</label><input id="e-height" type="number" value="'+m.height+'"></div>'+
+    '<div><label>Weight (kg)</label><input id="e-weight" type="number" value="'+m.weight+'"></div></div>'+
+    '<label>Fitness Goal</label>'+
+    '<select id="e-goal">'+
+    '<option value="muscle"'+(m.goal==="muscle"?" selected":"")+'>Muscle Building</option>'+
+    '<option value="fatloss"'+(m.goal==="fatloss"?" selected":"")+'>Fat Loss</option>'+
+    '<option value="weightgain"'+(m.goal==="weightgain"?" selected":"")+'>Weight Gain</option>'+
+    '<option value="recomp"'+(m.goal==="recomp"?" selected":"")+'>Body Recomposition</option></select>'+
+    '<label>Activity Level</label>'+
+    '<select id="e-act">'+
+    '<option value="1.2"'+(m.activity==1.2?" selected":"")+'>Sedentary</option>'+
+    '<option value="1.375"'+(m.activity==1.375?" selected":"")+'>Lightly Active</option>'+
+    '<option value="1.55"'+(m.activity==1.55?" selected":"")+'>Moderately Active</option>'+
+    '<option value="1.725"'+(m.activity==1.725?" selected":"")+'>Very Active</option>'+
+    '<option value="1.9"'+(m.activity==1.9?" selected":"")+'>Athlete</option></select>'+
+    '<button class="btn btn-green" onclick="saveProfile()">Save and Recalculate</button>'+
+    '<div id="e-msg"></div></div>'+
+    '<div class="card" style="border-color:#ef535030;"><div class="card-title" style="color:#ef5350;">Change Passcode</div>'+
+    '<label>New 4-digit Passcode</label><input id="e-newpass" type="password" maxlength="4" placeholder="New PIN">'+
+    '<button class="btn btn-outline" style="color:#ef5350;border-color:#ef535040;" onclick="changePass()">Update Passcode</button>'+
+    '<div id="ep-msg"></div></div>';
+}
+
+function saveProfile(){
+  var age=+v("e-age"),h=+v("e-height"),w=+v("e-weight"),goal=v("e-goal"),act=+v("e-act"),gender=v("e-gender");
+  if(!age||!h||!w){ showMsg("e-msg","Please fill all fields."); return; }
+  CUR.age=age; CUR.height=h; CUR.weight=w; CUR.goal=goal; CUR.activity=act; CUR.gender=gender;
+  CUR.macros=calcMacros(age,h,w,goal,act,gender);
+  syncMember(); loadMemberDash();
+  setTimeout(function(){ showMsg("e-msg","Profile updated and macros recalculated!",true); },100);
+}
+
+function changePass(){
+  var np=v("e-newpass");
+  if(np.length!==4||isNaN(np)){ showMsg("ep-msg","Must be exactly 4 digits."); return; }
+  CUR.passcode=np; syncMember(); showMsg("ep-msg","Passcode updated!",true);
+}
+
+function loadOwnerDash(){
+  var gym=CUR_GYM;
+  var members=db.members.filter(function(m){ return m.gymCode===gym.code; });
+  var active=members.filter(function(m){ return m.active; }).length;
+  var html=
+    '<div class="page-title">'+gym.name+'</div>'+
+    '<div class="page-sub">Code: <span style="color:#ff6d00;">'+gym.code+'</span></div>'+
+    '<div class="stat-grid">'+
+    '<div class="stat-card"><div class="sv" style="color:#40c4ff;">'+members.length+'</div><div class="sl">Total</div></div>'+
+    '<div class="stat-card"><div class="sv" style="color:#00e676;">'+active+'</div><div class="sl">Active</div></div>'+
+    '<div class="stat-card"><div class="sv" style="color:#ef5350;">'+(members.length-active)+'</div><div class="sl">Paused</div></div>'+
+    '</div>'+
+    '<div class="card">'+
+    '<div class="sec-head"><div class="sec-title">Members</div>'+
+    (gym.active?'<button class="btn-sm btn-sm-red" onclick="ownerToggleGym(false)">Pause All</button>':'<button class="btn-sm btn-sm-green" onclick="ownerToggleGym(true)">Resume All</button>')+
+    '</div>'+
+    (members.length===0?'<div class="empty">No members yet</div>':members.map(ownerMemberCard).join(""))+
+    '</div>';
+  document.getElementById("owner-content").innerHTML=html;
+}
+
+function ownerMemberCard(m){
+  var con=getConsumed(m);
+  return '<div class="client-card">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
+    '<div style="display:flex;align-items:center;gap:12px;">'+
+    '<div class="avatar">'+m.name[0].toUpperCase()+'</div>'+
+    '<div><div style="font-size:15px;font-weight:700;">'+m.name+'</div>'+
+    '<div style="font-size:12px;color:#666;">Joined '+m.joinDate+'</div></div></div>'+
+    '<span class="badge '+(m.active?"badge-green":"badge-red")+'">'+(m.active?"Active":"Paused")+'</span></div>'+
+    '<div class="drow"><span class="dk">Age / Gender</span><span class="dv">'+m.age+'y / '+(m.gender||"—")+'</span></div>'+
+    '<div class="drow"><span class="dk">Height / Weight</span><span class="dv">'+m.height+'cm / '+m.weight+'kg</span></div>'+
+    '<div class="drow"><span class="dk">Goal</span><span class="dv" style="color:#ff6d00;">'+goalLabel(m.goal)+'</span></div>'+
+    '<div class="drow"><span class="dk">Daily Targets</span><span class="dv">'+m.macros.cal+'kcal | P:'+m.macros.pro+'g C:'+m.macros.car+'g F:'+m.macros.fat+'g</span></div>'+
+    '<div class="drow"><span class="dk">Today\'s Intake</span><span class="dv" style="color:#00e676;">'+con.cal+'kcal | P:'+con.pro+'g C:'+con.car+'g F:'+con.fat+'g</span></div>'+
+    '<div class="actions">'+
+    (m.active?'<button class="btn-sm btn-sm-red" onclick="ownerToggleMember('+m.id+',false)">Pause</button>':'<button class="btn-sm btn-sm-green" onclick="ownerToggleMember('+m.id+',true)">Activate</button>')+
+    '<button class="btn-sm btn-sm-red" onclick="deleteMember('+m.id+',\'owner\')">Delete Member</button>'+
+    '</div></div>';
+}
+
+function ownerToggleMember(id,status){
+  var m=db.members.find(function(x){ return x.id===id; });
+  if(m){ m.active=status; sv(); loadOwnerDash(); }
+}
+
+function ownerToggleGym(status){
+  CUR_GYM.active=status;
+  var idx=db.gyms.findIndex(function(g){ return g.code===CUR_GYM.code; });
+  if(idx>-1) db.gyms[idx]=CUR_GYM;
+  sv(); loadOwnerDash();
+}
+
+function deleteMember(id,from){
+  confirmAction("Delete this member permanently? This cannot be undone.",function(){
+    db.members=db.members.filter(function(m){ return m.id!==Number(id); });
+    sv();
+    if(from==="owner") loadOwnerDash(); else loadSuperDash();
+  });
+}
+
+function loadSuperDash(){
+  var total=db.gyms.length,active=db.gyms.filter(function(g){ return g.active; }).length,mem=db.members.length;
+  var html=
+    '<div class="page-title" style="color:#ce93d8;">Super Admin Panel</div>'+
+    '<div class="page-sub">Control all gyms on the FuelMax platform</div>'+
+    '<div class="stat-grid">'+
+    '<div class="stat-card"><div class="sv" style="color:#ce93d8;">'+total+'</div><div class="sl">Gyms</div></div>'+
+    '<div class="stat-card"><div class="sv" style="color:#00e676;">'+active+'</div><div class="sl">Active</div></div>'+
+    '<div class="stat-card"><div class="sv" style="color:#40c4ff;">'+mem+'</div><div class="sl">Members</div></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-title">Create New Gym</div>'+
+    '<div class="row2"><div><label>Gym Name</label><input id="ng-name" placeholder="e.g. Iron House Gym"></div>'+
+    '<div><label>Gym Code</label><input id="ng-code" placeholder="e.g. GYM002"></div></div>'+
+    '<label>Owner Passcode</label><input id="ng-pass" type="password" placeholder="Set owner passcode">'+
+    '<button class="btn btn-green" onclick="createGym()">Create Gym</button>'+
+    '<div id="ng-msg"></div></div>'+
+    '<div class="card" style="border-color:#ce93d830;"><div class="card-title" style="color:#ce93d8;">Change Super Admin Password</div>'+
+    '<label>Current Password</label><input id="sp-cur" type="password" placeholder="Current password">'+
+    '<label>New Password</label><input id="sp-new" type="password" placeholder="New password (min 4 chars)">'+
+    '<label>Confirm New Password</label><input id="sp-con" type="password" placeholder="Confirm new password">'+
+    '<button class="btn-purple" onclick="changeSuperPass()">Update Password</button>'+
+    '<div id="sp-msg"></div></div>'+
+    '<div class="card"><div class="card-title">All Gyms</div>'+
+    db.gyms.map(superGymCard).join("")+
+    '</div>';
+  document.getElementById("super-content").innerHTML=html;
+}
+
+function changeSuperPass(){
+  var cur=v("sp-cur"),np=v("sp-new"),con=v("sp-con");
+  var el=document.getElementById("sp-msg");
+  el.className="msg";
+  if(cur!==superPass){ el.className="msg err"; el.textContent="Current password is incorrect."; }
+  else if(!np||np.length<4){ el.className="msg err"; el.textContent="New password must be at least 4 characters."; }
+  else if(np!==con){ el.className="msg err"; el.textContent="Passwords do not match."; }
+  else {
+    superPass=np;
+    localStorage.setItem("fm_superpass",superPass);
+    el.className="msg ok"; el.textContent="Password updated successfully!";
+    setv("sp-cur",""); setv("sp-new",""); setv("sp-con","");
+  }
+}
+
+function superGymCard(g){
+  var members=db.members.filter(function(m){ return m.gymCode===g.code; });
+  var active=members.filter(function(m){ return m.active; }).length;
+  return '<div class="gym-card">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">'+
+    '<div><div style="font-size:15px;font-weight:700;">'+g.name+'</div>'+
+    '<div style="font-size:12px;color:#666;margin-top:2px;">Code: <span style="color:#ff6d00;">'+g.code+'</span> · Created: '+g.createdAt+'</div></div>'+
+    '<span class="badge '+(g.active?"badge-green":"badge-red")+'">'+(g.active?"Active":"Paused")+'</span></div>'+
+    '<div class="drow"><span class="dk">Members</span><span class="dv">'+members.length+' total, '+active+' active</span></div>'+
+    '<div class="actions">'+
+    (g.active?'<button class="btn-sm btn-sm-red" onclick="superToggleGym(\''+g.code+'\',false)">Stop Subscription</button>':'<button class="btn-sm btn-sm-green" onclick="superToggleGym(\''+g.code+'\',true)">Resume</button>')+
+    '<button class="btn-sm btn-sm-orange" onclick="superViewMembers(\''+g.code+'\')">View Members</button>'+
+    '<button class="btn-sm btn-sm-red" onclick="superDeleteGym(\''+g.code+'\')">Delete Gym</button>'+
+    '</div>'+
+    '<div id="gm-'+g.code+'" style="display:none;margin-top:14px;"></div>'+
+    '</div>';
+}
+
+function superToggleGym(code,status){
+  var g=db.gyms.find(function(x){ return x.code===code; });
+  if(g){ g.active=status; sv(); loadSuperDash(); }
+}
+
+function superDeleteGym(code){
+  confirmAction("Delete gym "+code+" AND all its members permanently?",function(){
+    db.gyms=db.gyms.filter(function(g){ return g.code!==code; });
+    db.members=db.members.filter(function(m){ return m.gymCode!==code; });
+    sv(); loadSuperDash();
+  });
+}
+
+function superViewMembers(code){
+  var el=document.getElementById("gm-"+code);
+  if(!el) return;
+  if(el.style.display!=="none"){ el.style.display="none"; return; }
+  var members=db.members.filter(function(m){ return m.gymCode===code; });
+  if(members.length===0){ el.innerHTML='<div class="empty">No members in this gym</div>'; el.style.display="block"; return; }
+  el.innerHTML=members.map(function(m){
+    return '<div style="background:#111;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #222;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;">'+
+      '<div><div style="font-size:13px;font-weight:700;">'+m.name+' <span class="badge '+(m.active?"badge-green":"badge-red")+'">'+(m.active?"Active":"Paused")+'</span></div>'+
+      '<div style="font-size:11px;color:#666;margin-top:3px;">'+m.weight+'kg · '+goalLabel(m.goal)+' · '+m.macros.cal+'kcal/day</div></div>'+
+      '<div style="display:flex;gap:6px;">'+
+      (m.active?'<button class="btn-sm btn-sm-red" onclick="superToggleMember('+m.id+',false,\''+code+'\')">Pause</button>':'<button class="btn-sm btn-sm-green" onclick="superToggleMember('+m.id+',true,\''+code+'\')">Activate</button>')+
+      '<button class="btn-sm btn-sm-red" onclick="deleteMember('+m.id+',\'super\')">Delete</button>'+
+      '</div></div></div>';
+  }).join("");
+  el.style.display="block";
+}
+
+function superToggleMember(id,status,code){
+  var m=db.members.find(function(x){ return x.id===Number(id); });
+  if(m){ m.active=status; sv(); superViewMembers(code); }
+}
+
+function createGym(){
+  var name=v("ng-name"),code=v("ng-code").toUpperCase(),pass=v("ng-pass");
+  if(!name||!code||!pass){ showMsg("ng-msg","Please fill all fields."); return; }
+  if(db.gyms.find(function(g){ return g.code===code; })){ showMsg("ng-msg","Gym code already exists."); return; }
+  db.gyms.push({code:code,name:name,ownerPass:pass,active:true,createdAt:new Date().toLocaleDateString()});
+  sv(); showMsg("ng-msg","Gym created! Code: "+code,true);
+  setTimeout(loadSuperDash,1200);
+}
+
+function mTab(el,id){
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
+  el.classList.add("active");
+  ["mt-home","mt-food","mt-supps","mt-eaten","mt-tips","mt-edit"].forEach(function(x){ document.getElementById(x).style.display="none"; });
+  document.getElementById(id).style.display="block";
+}
+</script>
+</body>
+</html>
